@@ -9,6 +9,7 @@ pip install glfw
 
 pip install PyOpenGL
 
-ip install requests
+pip install requests
    
 
+!!! MADE FOR 1720x1080 !!!
