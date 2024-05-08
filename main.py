@@ -10,11 +10,12 @@ from requests import get
 offsets = get('https://raw.githubusercontent.com/a2x/cs2-dumper/main/output/offsets.json').json()
 client_dll = get('https://raw.githubusercontent.com/a2x/cs2-dumper/main/output/client.dll.json').json()
 
-dwEntityList = offsets['client.dll']['dwEntityList']
-dwLocalPlayerPawn = offsets['client.dll']['dwLocalPlayerPawn']
-dwViewMatrix = offsets['client.dll']['dwViewMatrix']
+dwEntityList = 0x18C7F88
+dwLocalPlayerPawn = 0x173B568
+dwViewMatrix = 0x1929420
 
 m_iTeamNum = client_dll['client.dll']['classes']['C_BaseEntity']['fields']['m_iTeamNum']
+m_lifeState = client_dll['client.dll']['classes']['C_BaseEntity']['fields']['m_lifeState']
 m_pGameSceneNode = client_dll['client.dll']['classes']['C_BaseEntity']['fields']['m_pGameSceneNode']
 
 m_modelState = client_dll['client.dll']['classes']['CSkeletonInstance']['fields']['m_modelState']
@@ -58,7 +59,9 @@ def esp(draw_list):
         return
 
 
-    for i in range(64):
+    for i in range(16):
+
+
         entity = pm.read_longlong(client + dwEntityList)
 
         if not entity:
@@ -86,7 +89,13 @@ def esp(draw_list):
 
         entity_pawn_addr = pm.read_longlong(list_entry + (120) * (entity_controller_pawn & 0x1FF))
 
+
         if not entity_pawn_addr or entity_pawn_addr == local_player_pawn_addr:
+            continue
+
+        entity_alive = pm.read_int(entity_pawn_addr + m_lifeState)
+
+        if entity_alive != 256:
             continue
 
         entity_team = pm.read_int(entity_pawn_addr + m_iTeamNum)
